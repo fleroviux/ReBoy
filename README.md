@@ -1,5 +1,5 @@
 # ReBoy
-A basic Nintendo Game Boy emulator.
+A basic Nintendo Game Boy emulator. Not particularily accurate or good, just a fun excercise.
 
 ## Timeline
 
