@@ -443,7 +443,8 @@ void RETI() {
 }
 
 void HALT() {
-  // TODO: implement the infamous HALT-bug
+  if (!interrupt_master_enable)
+    halt_bug = true;
   halted = true;
 }
 

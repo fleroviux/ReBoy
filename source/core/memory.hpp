@@ -17,8 +17,8 @@
 
 class Memory : public MemoryBase {
 public:
-  Memory(IRQ* irq, PPU* ppu, APU* apu, Timer* timer, Joypad* joypad)
-    : irq(irq), ppu(ppu), apu(apu), timer(timer), joypad(joypad) { Reset(); }
+  Memory(Scheduler* scheduler, IRQ* irq, PPU* ppu, APU* apu, Timer* timer, Joypad* joypad)
+    : scheduler(scheduler), irq(irq), ppu(ppu), apu(apu), timer(timer), joypad(joypad) { Reset(); }
 
   void Reset();
   auto ReadByte(std::uint16_t address) -> std::uint8_t;
@@ -35,6 +35,7 @@ private:
   std::uint8_t rom[0x8000];
   std::uint8_t wram[0x2000];
   std::uint8_t hram[0x7F];
+  Scheduler* scheduler;
   IRQ* irq;
   PPU* ppu;
   APU* apu;

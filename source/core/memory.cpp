@@ -19,6 +19,10 @@ void Memory::Reset() {
 }
 
 auto Memory::ReadByte(std::uint16_t address) -> std::uint8_t {
+  scheduler->AddCycles(4);
+  scheduler->Step();
+  apu->Step(); // weird but does the job.
+
   switch (address >> 12) {
     // ROM and External RAM
     case 0x0 ... 0x7:
@@ -69,6 +73,10 @@ auto Memory::ReadByte(std::uint16_t address) -> std::uint8_t {
 }
 
 void Memory::WriteByte(std::uint16_t address, std::uint8_t value) {
+  scheduler->AddCycles(4);
+  scheduler->Step();
+  apu->Step(); // weird but does the job.
+
   switch (address >> 12) {
     // ROM and External RAM
     case 0x0 ... 0x7:

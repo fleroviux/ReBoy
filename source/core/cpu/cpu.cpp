@@ -19,13 +19,18 @@ void CPU::Reset() {
   GetRegW(RegW::SP) = 0;
   GetRegW(RegW::PC) = 0;
   interrupt_master_enable = false;
+  halted = false;
+  halt_bug = false;
 }
 
 void CPU::RaiseIRQ(std::uint8_t vector) {
   halted = false;
-  interrupt_master_enable = false;
-  Push(pc);
-  pc = vector;
+  //halt_bug = false;
+  if (interrupt_master_enable) {
+    interrupt_master_enable = false;
+    Push(pc);
+    pc = vector;
+  }
 }
 
 auto CPU::GetRegB(RegB reg) -> std::uint8_t& {
@@ -80,8 +85,10 @@ auto CPU::GetFlag(Flag flag) -> bool {
 }
 
 void CPU::Step() {
-  if (halted)
-    return;
   auto opcode = memory->ReadByte(GetRegW(RegW::PC)++);
+  if (halt_bug) {
+    GetRegW(RegW::PC)--;
+    halt_bug = false;
+  }
   (this->*sOpcodeTable[opcode])();
 }

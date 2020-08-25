@@ -30,7 +30,7 @@ public:
     ppu(&scheduler, &irq),
     apu(&scheduler),
     timer(&scheduler, &irq),
-    memory(&irq, &ppu, &apu, &timer, &joypad),
+    memory(&scheduler, &irq, &ppu, &apu, &timer, &joypad),
     cpu(&memory) { Reset(); }
 
   void Reset() {
@@ -138,11 +138,15 @@ public:
     ppu.SetBuffer(buffer);
 
     while (scheduler.GetTimestampNow() < target) {
-      cpu.Step();
+      if (cpu.IsHalted()) {
+        // TODO: fast skip to the next event?
+        scheduler.AddCycles(4);
+        scheduler.Step();
+        apu.Step(); // weird but does the job.
+      } else {
+        cpu.Step();
+      }
       irq.Step();
-      apu.Step();
-      scheduler.AddCycles(4);
-      scheduler.Step();
     }
   }
 

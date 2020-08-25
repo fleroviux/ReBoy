@@ -20,12 +20,14 @@ void IRQ::Step() {
   constexpr std::uint8_t kIRQVectors[] = {
           0x40, 0x48, 0x50, 0x58, 0x60 };
   auto enabled_and_requested = _ie & _if;
-  if (!cpu->interrupt_master_enable || enabled_and_requested == 0)
+  if (enabled_and_requested == 0)
     return;
   for (int i = 0; i <= 4; i++) {
     if (enabled_and_requested & (1 << i)) {
+      // FIXME: let RaiseIRQ decide if the IRQ will be acknowledged.
+      if (cpu->interrupt_master_enable)
+        _if &= ~(1 << i);
       cpu->RaiseIRQ(kIRQVectors[i]);
-      _if &= ~(1 << i);
       break;
     }
   }

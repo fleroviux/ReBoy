@@ -18,6 +18,7 @@ public:
   void Reset();
   void Step();
   void RaiseIRQ(std::uint8_t vector);
+  auto IsHalted() -> bool { return halted; }
 
   bool interrupt_master_enable;
 
@@ -56,6 +57,7 @@ private:
   std::uint16_t pc;
 
   bool halted = false;
+  bool halt_bug;
 
   void Push(std::uint16_t value) {
     sp -= 2;
