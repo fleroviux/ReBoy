@@ -1,0 +1,46 @@
+  
+name: Build
+
+on: push
+
+jobs:
+  build-windows:
+    runs-on: windows-latest
+    
+    steps:
+      - uses: actions/checkout@master
+      
+      - name: Setup vcpkg
+        run: vcpkg integrate install
+        shell: cmd
+
+      - name: Setup SDL2
+        run: vcpkg install sdl2:x64-windows
+        shell: cmd
+        
+      - name: Generate solution
+        run: |
+          mkdir build
+          cd build
+          set VCPKG_ROOT=C:/vcpkg
+          cmake -DCMAKE_BUILD_TYPE=Release -T clangcl ..
+        shell: cmd
+
+      - name: Build ReBoy
+        run: |
+          call "C:\Program Files (x86)\Microsoft Visual Studio\2019\Enterprise\VC\Auxiliary\Build\vcvars64.bat"
+          msbuild /property:Configuration=Release build\ReBoy.sln
+        shell: cmd
+
+      - name: Collect files
+        run: |
+          mkdir upload
+          move build\Release\ReBoy.exe upload
+          move build\Release\SDL2.dll upload
+        shell: cmd
+
+      - name: Upload files
+        uses: actions/upload-artifact@master
+        with:
+          name: ReBoy-win64
+          path: upload
