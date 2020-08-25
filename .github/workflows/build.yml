@@ -15,7 +15,7 @@ jobs:
         shell: cmd
 
       - name: Setup SDL2
-        run: vcpkg install sdl2
+        run: vcpkg install sdl2:x64-windows
         shell: cmd
         
       - name: Generate solution
