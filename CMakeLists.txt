@@ -4,7 +4,7 @@ project(GBemu)
 set(CMAKE_CXX_STANDARD 17)
 set(CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} ${CMAKE_SOURCE_DIR}/cmake)
 
-include(FindSDL2 REQUIRED)
+include(FindSDL2)
 find_package(SDL2 REQUIRED)
 
 add_executable(ReBoy
