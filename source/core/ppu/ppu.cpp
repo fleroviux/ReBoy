@@ -41,6 +41,9 @@ void PPU::RenderScanline() {
   if (buffer == nullptr)
     return;
 
+  for (int x = 0; x < 160; x++)
+    bg_is_color0[x] = true;
+
   if (lcdc.enable_bg)
     RenderBackground();
 
@@ -188,7 +191,7 @@ void PPU::SearchAndPrioritizeOBJs() {
       }
       auto& bucket = buckets[sprite.x];
       if (bucket.count == 10) {
-        break;
+        continue;
       }
       bucket.list[bucket.count++] = &sprite;
     }
