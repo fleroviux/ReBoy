@@ -39,7 +39,7 @@ int main(int argc, char** argv) {
 
   auto gameboy = new GameBoy();
 
-  if (!gameboy->LoadBootROM("boot.bin")) {
+  if (!gameboy->LoadBootROM("boot_cgb.bin")) {
     return -2;
   }
 

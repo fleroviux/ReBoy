@@ -17,7 +17,7 @@ PPU::PPU(Scheduler* scheduler, IRQ* irq) : scheduler(scheduler), irq(irq)  {
 }
 
 void PPU::Reset() {
-  std::memset(vram, 0, 0x2000);
+  std::memset(vram, 0, 0x4000);
   std::memset(oam, 0, 0xA0);
   lcdc = {};
   stat = {};

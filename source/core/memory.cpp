@@ -13,9 +13,11 @@
 
 void Memory::Reset() {
   std::memset(rom, 0, 0x8000);
-  std::memset(wram, 0, 0x2000);
+  std::memset((std::uint8_t*)wram, 0, 0x8000);
   std::memset(hram, 0, 0x7F);
   bootrom_disable = false;
+  wram_bank = 1;
+  vram_bank = 0;
 }
 
 auto Memory::ReadByte(std::uint16_t address) -> std::uint8_t {
@@ -27,6 +29,13 @@ auto Memory::ReadByte(std::uint16_t address) -> std::uint8_t {
     // ROM and External RAM
     case 0x0 ... 0x7:
     case 0xA ... 0xB: {
+      if (!bootrom_disable) {
+        if (address <= 0xFF)
+          return boot[address];
+        if (enable_is_cgb && address >= 0x200 && address <= 0x7FF)
+          return boot_cgb[address - 0x200];
+      }
+
       if (!bootrom_disable && address <= 0xFF)
         return boot[address];
       if (mapper != nullptr)
@@ -36,23 +45,26 @@ auto Memory::ReadByte(std::uint16_t address) -> std::uint8_t {
 
     // VRAM
     case 0x8 ... 0x9: {
-      return ppu->ReadVRAM(address & 0x1FFF);
+      return ppu->ReadVRAM((vram_bank << 13) | (address & 0x1FFF));
     }
 
     // Work RAM
-    case 0xC ... 0xD: {
-      return wram[address & 0x1FFF];
+    case 0xC: {
+      return wram[0][address & 0x1FFF];
+    }
+    case 0xD: {
+      return wram[wram_bank][address & 0x1FFF];
     }
 
     // ECHO
     case 0xE: {
-      return wram[address & 0xFFF];
+      return wram[0][address & 0xFFF];
     }
 
     case 0xF: {
       // ECHO
       if (address <= 0xFDFF)
-        return wram[0x1000 + (address & 0xDFF)];
+        return wram[1][address & 0xDFF];
       // OAM
       if (address <= 0xFE9F) {
         return ppu->ReadOAM(address & 0x9F);
@@ -88,27 +100,30 @@ void Memory::WriteByte(std::uint16_t address, std::uint8_t value) {
 
     // VRAM
     case 0x8 ... 0x9: {
-      ppu->WriteVRAM(address & 0x1FFF, value);
+      ppu->WriteVRAM((vram_bank << 13) | (address & 0x1FFF), value);
       break;
     }
 
     // Work RAM
-    case 0xC:
+    case 0xC: {
+      wram[0][address & 0x1FFF] = value;
+      break;
+    }
     case 0xD: {
-      wram[address & 0x1FFF] = value;
+      wram[wram_bank][address & 0x1FFF] = value;
       break;
     }
 
       // ECHO
     case 0xE: {
-      wram[address & 0xFFF] = value;
+      wram[0][address & 0xFFF] = value;
       break;
     }
 
     case 0xF: {
       // ECHO
       if (address <= 0xFDFF) {
-        wram[0x1000 + (address & 0xDFF)] = value;
+        wram[1][address & 0xDFF] = value;
       }
       // OAM
       else if (address <= 0xFE9F) {
@@ -145,6 +160,12 @@ auto Memory::ReadMMIO(std::uint8_t reg) -> std::uint8_t {
 
   if (reg == IRQ::REG_IE || reg == IRQ::REG_IF)
     return irq->ReadMMIO(reg);
+
+  // CGB registers
+  if (reg == 0x4F)
+    return vram_bank;
+  if (reg == 0x70)
+    return wram_bank;
 
   std::printf("Unhandled MMIO read from 0xFF%02X\n", reg);
   return 0x0;
@@ -186,8 +207,20 @@ void Memory::WriteMMIO(std::uint8_t reg, std::uint8_t value) {
     return;
   }
 
+  // CGB registers
+  if (reg == 0x4F) {
+    vram_bank = value & 1;
+    return;
+  }
   if (reg == 0x50) {
     bootrom_disable = value & 1;
+    return;
+  }
+
+  if (reg == 0x70) {
+    if (value == 0)
+      value = 1;
+    wram_bank = value & 7;
     return;
   }
 

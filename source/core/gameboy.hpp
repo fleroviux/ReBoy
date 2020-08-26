@@ -60,11 +60,18 @@ public:
     file.seekg(0, std::ios::end);
     size = file.tellg();
     file.seekg(0);
-    if (size != 256) {
-      std::puts("Bad BOOTROM dump: file must be exactly 256 bytes big. ");
+    if (size != 256 && size != 2304) {
+      std::puts("Bad BOOTROM dump: file must be exactly 256 (GB) or 2304 (GBC) bytes big. ");
       return false;
     }
-    file.read((char*)memory.boot, size);
+    file.read((char*)memory.boot, 256);
+    if (size == 2304) {
+      file.seekg(0x200);
+      file.read((char *) memory.boot_cgb, 0x700);
+      memory.enable_is_cgb = true;
+    } else {
+      memory.enable_is_cgb = false;
+    }
     return true;
   }
 

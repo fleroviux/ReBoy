@@ -26,14 +26,16 @@ public:
   auto GetROM1Bank() -> std::uint8_t override { return mapper == nullptr ? 1 : mapper->GetROM1Bank(); }
 
   /// BOOTROM memory region
-  std::uint8_t boot[256];
+  std::uint8_t boot[0x100];
+  std::uint8_t boot_cgb[0x700];
+  bool enable_is_cgb = false;
 
   /// GamePak MBC + ROM + SRAM
   MBCBase* mapper = nullptr;
 
 private:
   std::uint8_t rom[0x8000];
-  std::uint8_t wram[0x2000];
+  std::uint8_t wram[8][0x1000];
   std::uint8_t hram[0x7F];
   Scheduler* scheduler;
   IRQ* irq;
@@ -43,6 +45,8 @@ private:
   Joypad* joypad;
 
   bool bootrom_disable;
+  int wram_bank;
+  int vram_bank;
 
   auto ReadMMIO(std::uint8_t reg) -> std::uint8_t;
   void WriteMMIO(std::uint8_t reg, std::uint8_t value);

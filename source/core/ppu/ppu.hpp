@@ -87,7 +87,7 @@ private:
     Transfer = 3
   };
 
-  std::uint8_t vram[0x2000];
+  std::uint8_t vram[0x4000];
   std::uint8_t oam[0xA0];
 
   struct LCDC {
