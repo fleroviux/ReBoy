@@ -21,8 +21,8 @@ public:
     : scheduler(scheduler), irq(irq), ppu(ppu), apu(apu), timer(timer), joypad(joypad) { Reset(); }
 
   void Reset();
-  auto ReadByte(std::uint16_t address) -> std::uint8_t;
-  void WriteByte(std::uint16_t address, std::uint8_t value);
+  auto ReadByte(std::uint16_t address) -> std::uint8_t override;
+  void WriteByte(std::uint16_t address, std::uint8_t value) override;
   auto GetROM1Bank() -> std::uint8_t override { return mapper == nullptr ? 1 : mapper->GetROM1Bank(); }
 
   /// BOOTROM memory region
