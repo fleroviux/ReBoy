@@ -25,7 +25,7 @@ public:
     }
   }
 
-  void Write(std::uint16_t address, std::uint8_t value) {
+  void Write(std::uint16_t address, std::uint8_t value) override {
     // ...
   }
 private:
