@@ -52,7 +52,7 @@ auto Timer::ReadMMIO(std::uint8_t reg) -> std::uint8_t {
       return tma;
     case REG_TAC:
       return static_cast<std::uint8_t>(tac.clock_select) |
-             tac.enabled ? 4 : 0;
+             (tac.enabled ? 4 : 0);
   }
   return 0;
 }
