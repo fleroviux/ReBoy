@@ -44,4 +44,7 @@ add_executable(ReBoy
         source/core/apu/apu.hpp source/core/apu/apu.cpp
         source/core/apu/callback.cpp source/core/mbc/backup-file.hpp)
 target_include_directories(ReBoy PRIVATE ${SDL2_INCLUDE_DIR})
-target_link_libraries(ReBoy ${SDL2_LIBRARY} stdc++fs)
+target_link_libraries(ReBoy ${SDL2_LIBRARY})
+if (CMAKE_CXX_COMPILER_ID STREQUAL GNU)
+    target_link_libraries(ReBoy stdc++fs)
+endif()
