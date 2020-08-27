@@ -1,6 +1,8 @@
 # ReBoy
 A basic Nintendo Game Boy emulator. Not particularily accurate or good, just a fun excercise.
 
+![screenshot](screenshot.png)
+
 ## Timeline
 
 The first functioning version of ReBoy was put together in roughly seven days.
