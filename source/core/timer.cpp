@@ -37,8 +37,7 @@ void Timer::StepTimer(int cycles_late) {
 void Timer::ScheduleTimer(int cycles_late) {
   static constexpr int kTimerDuty[4] {
     1024, 16, 64, 256 };
-  auto duty = kTimerDuty[static_cast<int>(tac.clock_select)];
-  auto cycles = duty - (scheduler->GetTimestampNow() & (duty - 1)) - cycles_late;
+  auto cycles = kTimerDuty[static_cast<int>(tac.clock_select)] - cycles_late;
   timer_event = scheduler->Add(cycles, [this](int cycles_late){StepTimer(cycles_late);});
 }
 
